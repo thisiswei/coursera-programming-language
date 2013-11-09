@@ -125,3 +125,13 @@ fun unzip2 lst =
          [] => ([], [], [])
        | (a, b, c) :: tl => let val (v1, v2, v3) = unzip2 tl
                             in (a :: v1, b :: v2, c::v3) end
+
+(* More nested pattern matching *)
+
+fun nondescreasing xs =
+    case xs of
+         [] => true
+       | _::[] => true
+       | x::(neck::rest) => x<=neck andalso nondescreasing (neck::rest)
+
+
