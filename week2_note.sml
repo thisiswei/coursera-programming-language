@@ -134,4 +134,14 @@ fun nondescreasing xs =
        | _::[] => true
        | x::(neck::rest) => x<=neck andalso nondescreasing (neck::rest)
 
-
+datatype sgn = N | P | Z
+fun multsign(x1, x2) =
+    let fun sign x = if x=0 then Z else if x < 0 then N else P
+    in
+        case (sign x1, sign x2) of
+             (Z, _) => Z
+           | (_, Z) => Z
+           | (P, P) => P
+           | (N, N) => P
+           | _ => N
+    end
