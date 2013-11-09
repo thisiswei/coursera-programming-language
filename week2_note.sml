@@ -24,6 +24,14 @@ datatype exp = Constant of int
              | Add of exp * exp
              | Multiply of exp * exp
 
+fun eval (Constant i) = i
+  | eval (Negate e2) = ~ (eval e2)
+  | eval (Add(e1, e2)) = (eval e1) + (eval e2)
+  | eval (Multiply(e1, e2)) = (eval e1) * (eval e2)
+
+fun append ([], ys) = ys
+  | append (x::xs', ys) = x :: append(xs', ys)
+
 fun eval e =
     case e of
          Constant i => i
@@ -145,3 +153,4 @@ fun multsign(x1, x2) =
            | (N, N) => P
            | _ => N
     end
+
