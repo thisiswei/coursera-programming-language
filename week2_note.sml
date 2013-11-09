@@ -35,6 +35,7 @@ fun append ([], ys) = ys
 fun eval e =
     case e of
          Constant i => i
+
        | Negate e2 => ~ (eval e2)
        | Add(e1, e2) => (eval e1) + (eval e2)
        | Multiply(e1, e2) => (eval e1) * (eval e2)
@@ -153,4 +154,30 @@ fun multsign(x1, x2) =
            | (N, N) => P
            | _ => N
     end
+
+fun hd x =
+    case x of
+         [] => raise List.Empty
+       | x::_ => x
+
+exception Myexception
+exception Myexception2 of int * int
+
+fun mydiv(x, y) =
+    if y=0
+    then raise Myexception
+    else x div y
+
+fun maxlist(xs, ex) =
+    case xs of 
+         [] => raise ex
+       | x::[] => x
+       | x::xs' => Int.max(x, maxlist(xs', ex))
+(* e1 handle ex => e2 *)
+(* if e1 raise exception, we catch that, then evaluate e2 *)
+
+val x = maxlist([], Myexception)
+    handle Myexception => 52
+
+
 
