@@ -119,3 +119,9 @@ fun zip2 list_triple =
          ([], [], []) => []
        | (hd1::tl1, hd2::tl2, hd3::tl3) => (hd1, hd2, hd3) :: zip2(tl1, tl2, tl3)
        | _ => raise wtf
+
+fun unzip2 lst =
+    case lst of
+         [] => ([], [], [])
+       | (a, b, c) :: tl => let val (v1, v2, v3) = unzip2 tl
+                            in (a :: v1, b :: v2, c::v3) end
