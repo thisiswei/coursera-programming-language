@@ -36,7 +36,7 @@ fun number_of_adds e =
          Constant i => 0
        | Negate e2 => number_of_adds e2
        | Add (e1, e2) => 1 + number_of_adds e1 + number_of_adds e2
-       | Add (e1, e2) => number_of_adds e1 * number_of_adds e2
+       | Multiply (e1, e2) => number_of_adds e1 * number_of_adds e2
 
 val example_exp = Add ((Constant 19), Negate(Constant 4))
 
@@ -44,9 +44,8 @@ fun max_constant e =
     case e of
          Constant i => i
        | Negate e2 => max_constant e2
-       | Add(e1, e2) => if max_constant e1 > max_constant e2
-                        then max_constant e1
-                        else max_constant e2
+       | Add(e1, e2) => Int.max(max_constant e1, max_constant e2)
+       | Multiply(e1, e2) => Int.max(max_constant e1, max_constant e2)
 
 (* type name = t *)
 
@@ -109,17 +108,14 @@ fun full_name_good r =
     in x ^ " " ^ y ^ " " ^ z end
 
 fun full_name_great {first=x, middle=y, last=z} =
-    x ^ " " ^ y ^ " "
+    x ^ " " ^ y ^ " " ^ z
 
-val p = e (*patten to expression*)
-
-fun zip3([x, y, z], [x', y', z'], [x'', y'', z''])=
-    [(x, x', x''), (y, y', y''), (z, z', z'')]
+(* val p = e patten to expression *)
 
 exception wtf
 
 fun zip2 list_triple =
     case list_triple of
-         ([], [], []) = []
-       | (hd1::tl1, hd2::tl2, hd3::tl3) => (h1, h2, h3) :: zip2(tl1, tl2, tl3)
+         ([], [], []) => []
+       | (hd1::tl1, hd2::tl2, hd3::tl3) => (hd1, hd2, hd3) :: zip2(tl1, tl2, tl3)
        | _ => raise wtf
