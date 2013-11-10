@@ -94,7 +94,7 @@ recursive.*)
 
 fun sum_cards(cs) =
     let fun aux(cs, acc) =
-            case cs of 
+            case cs of
                  [] => acc
                | c::cs' => aux(cs', card_value(c) + acc)
     in
@@ -112,18 +112,10 @@ Scoring works as follows: Let sum be the sum of the values of the held-cards.
 * division; use ML’s div operator) *)
 
 fun score(held_cards, goal) =
-    let fun pre_score(held_cards) =
-        let val value = sum_cards(held_cards)
-        in
-            if value > goal
-            then 3 * value
-            else goal - value
-        end
-        val prescore = pre_score(held_cards)
+    let val sum_ = sum_cards(held_cards)
+        val prescore = if sum_ > goal then 3 * (sum_ - goal) else goal - sum_
     in
-        if all_same_color(held_cards) 
-        then prescore
-        else prescore div 2
+        if all_same_color(held_cards) then prescore div 2 else prescore
     end
 
 (* (g) Write a function officiate, which “runs a game.” It takes a card list (the
@@ -158,10 +150,12 @@ fun officiate(cs, ms, goal) =
                  (_, _, [], _) => acc
                | ([], _, _, _)=> acc
                | (cs, helds, m::ms', acc) =>
-                       let val (new_cs, new_hs) = get_state(cs, helds, m)
-                       in
-                           play(new_cs, new_hs, ms', score(new_hs, goal)+acc)
-                       end
+                       case sum_cards(helds) > goal of
+                            true => acc
+                          | _ => let val (new_cs, new_hs) = get_state(cs, helds, m)
+                                 in
+                                     play(new_cs, new_hs, ms', score(new_hs, goal)+acc)
+                                 end
     in
         play(cs, [], ms, 0)
     end

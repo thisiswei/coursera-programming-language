@@ -26,14 +26,6 @@ fun provided_test2 () = (* correct behavior: return 3 *)
 
 fun officiate_test3 () = (* correct behavior: return 6 *)
     (* two different colors *)
-    let val cards = [(Clubs,Ace),(Diamonds,Ace),(Clubs,Ace),(Spades,Ace)]
-        val moves = [Draw,Draw,Draw,Draw]
-    in
-         officiate(cards,moves,50)
-    end
-
-fun officiate_test3 () = (* correct behavior: return 6 *)
-    (* two different colors *)
     let val cards = [(Clubs,Ace),(Diamonds,Ace),(Clubs,Ace),(Spades,Ace),(Clubs,Num 10)]
         val moves = [Draw,Draw,Draw,Draw,Draw]
     in
