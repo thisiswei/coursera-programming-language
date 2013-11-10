@@ -10,7 +10,7 @@ fun same_string(s1 : string, s2 : string) =
 
 fun all_exception_option (s, []) = NONE
   | all_exception_option (s, x::xs) =
-  case same_string(s, x) of
+  case s=x of
        true => SOME xs
      | false => case all_exception_option(s, xs) of
                      NONE => NONE
@@ -49,7 +49,7 @@ datatype rank = Jack | Queen | King | Ace | Num of int
 type card = suit * rank
 
 datatype color = Red | Black
-datatype move = Discard of card | Draw 
+datatype move = Discard of card | Draw
 
 exception IllegalMove
 
@@ -74,11 +74,9 @@ c is in the list more than once, remove only the first one. If c is not in the
 list, raise the exception e. You can compare cards with =.*)
 
 fun remove_card (cs, c, e) =
-    case cs of
-         [] => []
-       | cs'::cs'' => case all_exception_option(cs', c) of
-                           NONE => raise e
-                         | SOME cards => cards @ remove_card(cs'', c, e)
+    case all_exception_option(c, cs) of
+         NONE => raise e
+       | SOME cards => cards
 
 (* (d) Write a function all_same_color, which takes a list of cards and returns
 true if all the cards in the list are the same color. Hint: An elegant
@@ -104,10 +102,31 @@ fun sum_cards(cs) =
     end
 
 (* (f) Write a function score, which takes a card list (the held-cards) and an
-int (the goal) and computes the score as described above. *)
+int (the goal) and computes the score as described below
 
-(*
-(g) Write a function officiate, which “runs a game.” It takes a card list (the
+Scoring works as follows: Let sum be the sum of the values of the held-cards.
+* If sum is greater than goal, the preliminary score is three times (sum−goal),
+* else the preliminary score is (goal − sum). The score is the preliminary score
+* unless all the held-cards are the same color, in which case the score is the
+* preliminary score divided by 2 (and rounded down as usual with integer
+* division; use ML’s div operator) *)
+
+fun score(held_cards, goal) =
+    let fun pre_score(held_cards) =
+        let val value = sum_cards(held_cards)
+        in
+            if value > goal
+            then 3 * value
+            else goal - value
+        end
+        val prescore = pre_score(held_cards)
+    in
+        if all_same_color(held_cards) 
+        then prescore
+        else prescore div 2
+    end
+
+(* (g) Write a function officiate, which “runs a game.” It takes a card list (the
 card-list) a move list (what the player “does” at each point), and an int (the
 goal) and returns the score at the end of the game after processing (some or all
 of) the moves in the move list in order. Use a locally
@@ -121,3 +140,28 @@ the game. As described above: *)
 • If the player draws and the card-list is (already) empty, the game is over. Else if drawing causes the sum of the held-cards to exceed the goal, the game is over (after drawing). Else play continues with a larger held-cards and a smaller card-list.
 Sample solution for (g) is under 20 lines.
 *)
+
+(*A game is played with a card-list and a goal. The player has a list of
+held-cards, initially empty.  The player makes a move by either drawing, which
+means removing the first card in the card-list from the card-list and adding 
+it to the held-cards, or discarding, which means choosing one of the held-cards
+to remove. The game ends either when the player chooses to make no more moves 
+or when the sum of the values of the held-cards is greater than the goal.*)
+
+fun officiate(cs, ms, goal) =
+    let fun get_state(cs::cs', helds, m) =
+            case m of
+                 Discard c => (cs::cs', remove_card(helds, c, IllegalMove))
+               | Draw => (cs', cs::helds)
+        fun play(cs, helds, ms, acc) =
+            case (cs, helds, ms, acc) of
+                 (_, _, [], _) => acc
+               | ([], _, _, _)=> acc
+               | (cs, helds, m::ms', acc) =>
+                       let val (new_cs, new_hs) = get_state(cs, helds, m)
+                       in
+                           play(new_cs, new_hs, ms', score(new_hs, goal)+acc)
+                       end
+    in
+        play(cs, [], ms, 0)
+    end
