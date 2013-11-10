@@ -94,9 +94,14 @@ fun all_same_color([]) = true
 sum of their values. Use a locally defined helper function that is tail
 recursive.*)
 
-
-
-
+fun sum_cards(cs) =
+    let fun aux(cs, acc) =
+            case cs of 
+                 [] => acc
+               | c::cs' => aux(cs', card_value(c) + acc)
+    in
+        aux(cs, 0)
+    end
 
 (* (f) Write a function score, which takes a card list (the held-cards) and an
 int (the goal) and computes the score as described above. *)
